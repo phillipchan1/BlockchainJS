@@ -15,7 +15,7 @@ class Blockchain {
       block.hash = block.calculateHash();
     }
 
-    console.log(this.chain)
+    console.log(this.chain);
     this.chain.push(block);
     this.saveChainToFile();
   }
@@ -25,9 +25,7 @@ class Blockchain {
     block.data = "This is the data for the new block.";
     block.timestamp = new Date().getTime();
 
-    
     block.hash = block.calculateHash();
-    
 
     this.addBlock(block);
 
@@ -44,6 +42,11 @@ class Blockchain {
       this.chain = JSON.parse(data);
     } catch (err) {
       console.error(`Error loading chain from file: ${err.message}`);
+      if (err.code === "ENOENT") {
+        console.log(`Creating new chain file: ${this.chainFilePath}`);
+        this.chain = [{}];
+        this.saveChainToFile();
+      }
     }
   }
 

@@ -1,36 +1,13 @@
-const crypto = require("crypto");
-
-class Block {
-  constructor() {
-    this.data = "";
-    this.timestamp = new Date().getTime();
-    this.hash = "";
-  }
-
-  calculateHash() {
-    const hash = crypto.createHash("sha256")
-
-    const data = JSON.stringify({
-      data: this.data,
-      timestamp: this.timestamp,
-    });
-
-    return hash.update(data)
-  }
-
-  isValid() {
-    const previousHash = this.previousBlock ? this.previousBlock.hash : "";
-    const calculatedHash = this.calculateHash();
-
-    return calculatedHash === previousHash;
-  }
-}
+const fs = require("fs");
+const Block = require("./block");
 
 class Blockchain {
   constructor() {
     this.chain = [];
     this.difficulty = 4;
     this.miningReward = 10;
+    this.chainFilePath = "./blockchain.json";
+    this.loadChainFromFile();
   }
 
   addBlock(block) {
@@ -39,6 +16,7 @@ class Blockchain {
     }
 
     this.chain.push(block);
+    this.saveChainToFile();
   }
 
   mineBlock() {
@@ -58,13 +36,24 @@ class Blockchain {
   getLatestBlock() {
     return this.chain[this.chain.length - 1];
   }
+
+  loadChainFromFile() {
+    try {
+      const data = fs.readFileSync(this.chainFilePath);
+      this.chain = JSON.parse(data);
+    } catch (err) {
+      console.error(`Error loading chain from file: ${err.message}`);
+    }
+  }
+
+  saveChainToFile() {
+    try {
+      const data = JSON.stringify(this.chain);
+      fs.writeFileSync(this.chainFilePath, data);
+    } catch (err) {
+      console.error(`Error saving chain to file: ${err.message}`);
+    }
+  }
 }
 
-const blockchain = new Blockchain();
-
-blockchain.addBlock(new Block());
-blockchain.addBlock(new Block());
-
-const latestBlock = blockchain.getLatestBlock();
-
-console.log(latestBlock);
+module.exports = Blockchain;

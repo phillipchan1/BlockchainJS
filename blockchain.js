@@ -15,6 +15,7 @@ class Blockchain {
       block.hash = block.calculateHash();
     }
 
+    console.log(this.chain)
     this.chain.push(block);
     this.saveChainToFile();
   }
@@ -24,9 +25,9 @@ class Blockchain {
     block.data = "This is the data for the new block.";
     block.timestamp = new Date().getTime();
 
-    while (!block.isValid()) {
-      block.hash = block.calculateHash();
-    }
+    
+    block.hash = block.calculateHash();
+    
 
     this.addBlock(block);
 
